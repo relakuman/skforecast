@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AIで始める予測と最適化入門 - UDEMY講座</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            overflow: hidden;
+            color: white;
+        }
+
+        .slide-container {
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .slide {
+            min-width: 100vw;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 2rem;
+            position: relative;
+            text-align: center;
+        }
+
+        .slide::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.3);
+            z-index: -1;
+        }
+
+        /* スライド個別背景 */
+        .slide:nth-child(1) { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+        .slide:nth-child(2) { background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); }
+        .slide:nth-child(3) { background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); }
+        .slide:nth-child(4) { background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%); }
+        .slide:nth-child(5) { background: linear-gradient(135deg, #fa709a 0%, #fee140 100%); }
+        .slide:nth-child(6) { background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%); }
+        .slide:nth-child(7) { background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%); }
+        .slide:nth-child(8) { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+
+        h1 {
+            font-size: 3.5rem;
+            margin-bottom: 1rem;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+            animation: slideInDown 1s ease-out;
+        }
+
+        h2 {
+            font-size: 2.8rem;
+            margin-bottom: 2rem;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+            animation: slideInDown 1s ease-out 0.2s both;
+        }
+
+        h3 {
+            font-size: 2.2rem;
+            margin-bottom: 1.5rem;
+            color: #ffd700;
+            animation: slideInDown 1s ease-out 0.4s both;
+        }
+
+        p, li {
+            font-size: 1.4rem;
+            line-height: 1.6;
+            margin-bottom: 1rem;
+            animation: slideInUp 1s ease-out 0.6s both;
+        }
+
+        .highlight {
+            color: #ffd700;
+            font-weight: bold;
+            font-size: 1.6rem;
+        }
+
+        .price {
+            font-size: 4rem;
+            color: #00ff88;
+            font-weight: bold;
+            text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.5);
+            margin: 1rem 0;
+            animation: pulse 2s infinite;
+        }
+
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 2rem;
+            max-width: 1000px;
+            margin: 2rem 0;
+        }
+
+        .feature-item {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            padding: 1.5rem;
+            border-radius: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .feature-item:hover {
+            transform: translateY(-10px) scale(1.05);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .stats {
+            display: flex;
+            justify-content: space-around;
+            width: 100%;
+            max-width: 800px;
+            margin: 2rem 0;
+        }
+
+        .stat-item {
+            text-align: center;
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            padding: 2rem;
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .stat-item:hover {
+            transform: scale(1.1);
+            background: rgba(255, 255, 255, 0.25);
+        }
+
+        .stat-number {
+            font-size: 3rem;
+            font-weight: bold;
+            color: #ffd700;
+            display: block;
+        }
+
+        .nav-buttons {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            display: flex;
+            gap: 1rem;
+            z-index: 1000;
+        }
+
+        .nav-btn {
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            padding: 1rem 2rem;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 1rem;
+        }
+
+        .nav-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: scale(1.1);
+        }
+
+        .nav-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .slide-indicator {
+            position: fixed;
+            bottom: 2rem;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 0.5rem;
+            z-index: 1000;
+        }
+
+        .indicator {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.4);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .indicator.active {
+            background: #ffd700;
+            transform: scale(1.3);
+        }
+
+        .curriculum-list {
+            text-align: left;
+            max-width: 800px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            padding: 2rem;
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .curriculum-list li {
+            padding: 0.8rem 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+            font-size: 1.2rem;
+        }
+
+        .curriculum-list li:last-child {
+            border-bottom: none;
+        }
+
+        .cta-button {
+            background: linear-gradient(45deg, #ff6b6b, #ee5a24);
+            color: white;
+            padding: 1.5rem 3rem;
+            border: none;
+            border-radius: 50px;
+            font-size: 1.5rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 2rem;
+            text-decoration: none;
+            display: inline-block;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .cta-button:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+            background: linear-gradient(45deg, #ee5a24, #ff6b6b);
+        }
+
+        @keyframes slideInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-100px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes slideInUp {
+            from {
+                opacity: 0;
+                transform: translateY(100px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        /* レスポンシブ対応 */
+        @media (max-width: 768px) {
+            h1 { font-size: 2.5rem; }
+            h2 { font-size: 2rem; }
+            h3 { font-size: 1.8rem; }
+            p, li { font-size: 1.2rem; }
+            .feature-grid { grid-template-columns: 1fr; }
+            .stats { flex-direction: column; gap: 1rem; }
+            .nav-buttons { bottom: 1rem; right: 1rem; }
+        }
+    </style>
+</head>
+<body>
+    <div class="slide-container" id="slideContainer">
+        <!-- スライド1: タイトル -->
+        <div class="slide">
+            <h1>🚀 AIで始める</h1>
+            <h1>予測と最適化入門</h1>
+            <p class="highlight">Python × AI × ビジネス価値創造</p>
+            <p>初心者でも4時間で実践的なスキルを習得</p>
+        </div>
+
+        <!-- スライド2: 問題提起 -->
+        <div class="slide">
+            <h2>😰 こんな悩みありませんか？</h2>
+            <div class="feature-grid">
+                <div class="feature-item">
+                    <h3>📊 データ活用</h3>
+                    <p>膨大なデータはあるが、予測や最適化に活用できていない</p>
+                </div>
+                <div class="feature-item">
+                    <h3>⏰ 時間不足</h3>
+                    <p>機械学習を学びたいが、時間がかかりすぎて挫折</p>
+                </div>
+                <div class="feature-item">
+                    <h3>💼 実践性</h3>
+                    <p>理論は学んだが、実際のビジネス問題に応用できない</p>
+                </div>
+                <div class="feature-item">
+                    <h3>🤖 AI活用</h3>
+                    <p>ChatGPTは使うが、効果的な活用方法がわからない</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- スライド3: ソリューション -->
+        <div class="slide">
+            <h2>✨ この講座が解決します！</h2>
+            <div class="stats">
+                <div class="stat-item">
+                    <span class="stat-number">4時間</span>
+                    <p>で実践スキル習得</p>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number">AI活用</span>
+                    <p>で学習効率10倍</p>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number">即実践</span>
+                    <p>明日から使える</p>
+                </div>
+            </div>
+            <p class="highlight">AIツールと連携した効率的学習で、短期間で実践的なスキルを身につけます</p>
+        </div>
+
+        <!-- スライド4: 価格と価値 -->
+        <div class="slide">
+            <h2>💰 圧倒的なコストパフォーマンス</h2>
+            <div class="price">¥19,800</div>
+            <p class="highlight">一般的なAI研修：30万円〜50万円</p>
+            <p class="highlight">本講座：わずか2万円以下で同等のスキル習得！</p>
+            <div class="stats">
+                <div class="stat-item">
+                    <span class="stat-number">ROI</span>
+                    <p>175%保証</p>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number">6ヶ月</span>
+                    <p>サポート付き</p>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number">即効性</span>
+                    <p>学習当日から効果</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- スライド5: カリキュラム -->
+        <div class="slide">
+            <h2>📚 学習カリキュラム</h2>
+            <div class="curriculum-list">
+                <ul>
+                    <li><strong>第1章（60分）:</strong> ビジネス予測と最適化の基礎</li>
+                    <li><strong>第2章（90分）:</strong> AI活用予測分析の実践</li>
+                    <li><strong>第3章（90分）:</strong> シンプルな最適化問題の解決</li>
+                    <li><strong>第4章（60分）:</strong> 統合演習（予測→最適化）</li>
+                </ul>
+            </div>
+            <p class="highlight">✅ 実際のコード付き　✅ AIプロンプト50個　✅ 実践データセット</p>
+        </div>
+
+        <!-- スライド6: 実績・事例 -->
+        <div class="slide">
+            <h2>🎯 期待できる成果</h2>
+            <div class="feature-grid">
+                <div class="feature-item">
+                    <h3>💹 コスト削減</h3>
+                    <p><strong>年間105万円削減</strong><br>在庫最適化による効果</p>
+                </div>
+                <div class="feature-item">
+                    <h3>📈 精度向上</h3>
+                    <p><strong>予測精度20%アップ</strong><br>売上予測の改善</p>
+                </div>
+                <div class="feature-item">
+                    <h3>⚡ 効率化</h3>
+                    <p><strong>作業時間80%短縮</strong><br>AI活用による自動化</p>
+                </div>
+                <div class="feature-item">
+                    <h3>🚀 スキル向上</h3>
+                    <p><strong>市場価値30%アップ</strong><br>データサイエンススキル</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- スライド7: 特典・サポート -->
+        <div class="slide">
+            <h2>🎁 豪華特典・サポート</h2>
+            <div class="feature-grid">
+                <div class="feature-item">
+                    <h3>📖 完全教材セット</h3>
+                    <p>・Jupyter Notebook<br>・実践データセット<br>・AIプロンプト集50個</p>
+                </div>
+                <div class="feature-item">
+                    <h3>👨‍🏫 手厚いサポート</h3>
+                    <p>・6ヶ月間Q&A対応<br>・月1回オンライン質問会<br>・専用Slackコミュニティ</p>
+                </div>
+                <div class="feature-item">
+                    <h3>📜 認定・保証</h3>
+                    <p>・修了証明書発行<br>・LinkedIn掲載可能<br>・30日間返金保証</p>
+                </div>
+                <div class="feature-item">
+                    <h3>🎯 継続学習</h3>
+                    <p>・上級講座50%割引<br>・最新情報月次配信<br>・発展課題10問</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- スライド8: CTA -->
+        <div class="slide">
+            <h2>🚀 今すぐ始めましょう！</h2>
+            <div class="stats">
+                <div class="stat-item">
+                    <span class="stat-number">限定</span>
+                    <p>先着100名様</p>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number">特価</span>
+                    <p>通常29,800円→19,800円</p>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number">保証</span>
+                    <p>30日間返金保証</p>
+                </div>
+            </div>
+            <a href="#" class="cta-button">🎯 今すぐ申し込む</a>
+            <p style="margin-top: 2rem; font-size: 1.2rem;">明日からAIを活用した予測・最適化のエキスパートに！</p>
+        </div>
+    </div>
+
+    <!-- ナビゲーション -->
+    <div class="nav-buttons">
+        <button class="nav-btn" id="prevBtn">◀ 前へ</button>
+        <button class="nav-btn" id="nextBtn">次へ ▶</button>
+    </div>
+
+    <!-- スライドインジケーター -->
+    <div class="slide-indicator" id="slideIndicator">
+        <span class="indicator active" data-slide="0"></span>
+        <span class="indicator" data-slide="1"></span>
+        <span class="indicator" data-slide="2"></span>
+        <span class="indicator" data-slide="3"></span>
+        <span class="indicator" data-slide="4"></span>
+        <span class="indicator" data-slide="5"></span>
+        <span class="indicator" data-slide="6"></span>
+        <span class="indicator" data-slide="7"></span>
+    </div>
+
+    <script>
+        let currentSlide = 0;
+        const totalSlides = 8;
+        const slideContainer = document.getElementById('slideContainer');
+        const prevBtn = document.getElementById('prevBtn');
+        const nextBtn = document.getElementById('nextBtn');
+        const indicators = document.querySelectorAll('.indicator');
+
+        function updateSlide() {
+            slideContainer.style.transform = `translateX(-${currentSlide * 100}vw)`;
+            
+            // ボタンの有効/無効
+            prevBtn.disabled = currentSlide === 0;
+            nextBtn.disabled = currentSlide === totalSlides - 1;
+            
+            // インジケーター更新
+            indicators.forEach((indicator, index) => {
+                indicator.classList.toggle('active', index === currentSlide);
+            });
+        }
+
+        function nextSlide() {
+            if (currentSlide < totalSlides - 1) {
+                currentSlide++;
+                updateSlide();
+            }
+        }
+
+        function prevSlide() {
+            if (currentSlide > 0) {
+                currentSlide--;
+                updateSlide();
+            }
+        }
+
+        function goToSlide(slideIndex) {
+            currentSlide = slideIndex;
+            updateSlide();
+        }
+
+        // イベントリスナー
+        nextBtn.addEventListener('click', nextSlide);
+        prevBtn.addEventListener('click', prevSlide);
+
+        indicators.forEach((indicator, index) => {
+            indicator.addEventListener('click', () => goToSlide(index));
+        });
+
+        // キーボードナビゲーション
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight' || e.key === ' ') {
+                nextSlide();
+            } else if (e.key === 'ArrowLeft') {
+                prevSlide();
+            }
+        });
+
+        // 自動再生（オプション）
+        let autoPlay = false;
+        if (autoPlay) {
+            setInterval(() => {
+                if (currentSlide < totalSlides - 1) {
+                    nextSlide();
+                } else {
+                    currentSlide = 0;
+                    updateSlide();
+                }
+            }, 10000);
+        }
+
+        // 初期化
+        updateSlide();
+
+        // スワイプ対応（モバイル）
+        let startX = 0;
+        let startY = 0;
+
+        document.addEventListener('touchstart', (e) => {
+            startX = e.touches[0].clientX;
+            startY = e.touches[0].clientY;
+        });
+
+        document.addEventListener('touchend', (e) => {
+            const endX = e.changedTouches[0].clientX;
+            const endY = e.changedTouches[0].clientY;
+            
+            const diffX = startX - endX;
+            const diffY = startY - endY;
+            
+            // 横スワイプの場合のみ
+            if (Math.abs(diffX) > Math.abs(diffY) && Math.abs(diffX) > 50) {
+                if (diffX > 0) {
+                    nextSlide();
+                } else {
+                    prevSlide();
+                }
+            }
+        });
+    </script>
+</body>
+</html>
